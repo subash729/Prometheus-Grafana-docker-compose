@@ -45,14 +45,17 @@ function print_fail {
 usage() {
     print_header "Scan and Filter Subdomains"
 
-    echo "Usage: $0 [-c <container_name>] [-d <data_directory>]"
+    echo "Usage: $0 [-c <container_name>] [-d <data_directory>] [-p <port>]"
     echo "Options:"
     echo "  -c, --container <container_name>    Container name to execute"
     echo "  -d, --directory <data_directory>    Optional: Directory to mount into the container"
+    echo "  -p, --port <port>                   Port number to expose the service"
     echo
     print_intermediate "Examples:"
-    print_init "  prometheus-setup.sh -c my_container"
-    print_init "  prometheus-setup.sh -c my_container -d /path/to/data"
+    print_init " ./prometheus-setup.sh -c my_container"
+    print_init " ./prometheus-setup.sh -c my_container -d /path/to/data"
+    print_init " ./prometheus-setup.sh -c my_container -p 9091"
+    print_init " ./prometheus-setup.sh -c my_container -d /path/to/data -p 9091"
     print_fail "For more information, contact us:"
     print_success "  Email: pingjiwan@gmail.com,  Phone: +977 9866358671"
     print_success "  Email: subaschy729@gmail.com, Phone: +977 9823827047"
@@ -63,6 +66,7 @@ usage() {
 taking_input() {
     local container_name=""
     local data_directory=""
+    local port="9090"  # Default port
 
     # Parse command-line options
     while [[ $# -gt 0 ]]; do
@@ -75,6 +79,11 @@ taking_input() {
                 ;;
             -d|--directory)
                 data_directory="$2"
+                shift # past argument
+                shift # past value
+                ;;
+            -p|--port)
+                port="$2"
                 shift # past argument
                 shift # past value
                 ;;
@@ -95,47 +104,55 @@ taking_input() {
     if [[ -z $data_directory ]]; then
         data_directory="$HOME/prometheus"
     fi
+    if [[ -z $port ]]; then
+        port="9090"
+    fi
+
+    # Making global variable so that it can be accessed from any functions
+    user_container="$container_name"
+    user_directory="$data_directory"
+    user_port="$port"
 }
 
 prerequisite_setup() {
     print_header "1 - Setup"
 
-    print_init "Creating Directory $data_directory"
+    print_init "Creating Directory $user_directory"
     print_separator
-    mkdir -p $data_directory
+    mkdir -p $user_directory
 
-    print_intermediate "Copying prometheus.yml to $data_directory"
-    cp "../source code/prometheus/prometheus.yml" $data_directory/prometheus.yml
+    print_intermediate "Copying prometheus.yml to $user_directory"
+    cp "../source code/prometheus/prometheus.yml" $user_directory/prometheus.yml
 }
 
 generate_docker_compose() {
-    local compose_file="$data_directory/docker-compose.yml"
+    local compose_file="$user_directory/docker-compose.yml"
 
     print_header "Generating Docker Compose file"
 
     cat << EOF > "$compose_file"
 version: '3'
 services:
-  $container_name:
+  $user_container:
+    container_name: $user_container
     image: prom/prometheus
     volumes:
       - prom_data:/etc/prometheus
     networks:
       - localprom
     ports:
-      - 9090:9090
+      - "$user_port:9090"
 
 networks:
   localprom:
     driver: bridge
-
 volumes:
   web_data:
   prom_data:
     driver: local
     driver_opts:
       type: none
-      device: $data_directory
+      device: $user_directory
       o: bind
 EOF
 
@@ -144,45 +161,53 @@ EOF
 }
 
 check_files_exist() {
-    local compose_file=$data_directory/docker-compose.yml
-    local prometheus_file=$data_directory/prometheus.yml
+    local compose_file=$user_directory/docker-compose.yml
+    local prometheus_file=$user_directory/prometheus.yml
 
     # Check if docker-compose.yml file exists
     if [[ ! -f $compose_file ]]; then
-        echo "Error: docker-compose.yml file not found in $data_directory directory."
+        echo "Error: docker-compose.yml file not found in $user_directory directory."
         exit 1
     fi
 
     # Check if prometheus.yml file exists
     if [[ ! -f $prometheus_file ]]; then
-        echo "Error: prometheus.yml file not found in $data_directory directory."
+        echo "Error: prometheus.yml file not found in $user_directory directory."
         exit 1
     fi
 }
 
 docker_compose() {
-    cd $data_directory
+    cd $user_directory
+    print_init "Creating container using docker compose up"
     docker compose up -d &
-    sleep 5
-    docker compose down
+    print_separator
 }
 
 display_final() {
+    local_ip=$(hostname -I | awk '{print $1}')
+    public_ip=$(curl -s ifconfig.me)
     print_header "Results"
-    echo -n  "All Final results are stored at:   "
-    print_success "$data_directory"
+    echo -n  "Container name            :       "
+    print_success "$user_container"
+    echo -n  "Access locally            :       "
+    print_success "http://$local_ip:$user_port/metrics"
+    echo -n  "Access publicly           :       "
+    print_success "http://$public_ip:$user_port/metrics"
+    echo -n  "Stored file location      :       "
+    print_success "$user_directory"
     print_separator
 }
 
 main() {
     taking_input "$@"
     prerequisite_setup
-    check_files_exist
     generate_docker_compose
+    check_files_exist
     docker_compose
     display_final
 
-    print_success "All Tasks are completed successfully"
+    print_success "All tasks are completed successfully!!!"
     print_separator
 }
 

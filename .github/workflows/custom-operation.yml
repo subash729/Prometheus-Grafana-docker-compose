@@ -9,8 +9,8 @@ on:
         type: choice
         options:
           - 'upgrade-package'
-          - 'new-custom-task'
-          - 'custom-with-secret'
+          - 'deploy-prometheus'
+          - 'Delete-default-container'
           - 'delete-all-local-temp-files'
 
 jobs:
@@ -25,24 +25,24 @@ jobs:
             whoami
             chmod +x upgrade-install.sh
             sudo ./upgrade-install.sh
-  custom-task:
-    if: github.event.inputs.environment == 'new-custom-task'
+  compose-up-task:
+    if: github.event.inputs.environment == 'deploy-prometheus'
     runs-on: self-hosted
     steps:
       - name: Scanning sub-domains
         working-directory: scripts 
-        run : |
-            ls -al
+        run: |
+          chmod +x prometheus-setup.sh
+          ./prometheus-setup.sh
 
-  custom-task-secret:
-    if: github.event.inputs.environment == 'custom-with-secret'
+  compose-down-task:
+    if: github.event.inputs.environment == 'Delete-default-container'
     runs-on: self-hosted
     steps:
-        - name: Authenticating mega and copying file
-          working-directory: scripts
+        - name: Making Docker-compose down
           run: |
-              chmod +x mega-config.sh  
-              ./custom.sh -u ${{ secrets.USERNAME }} -p ${{ secrets.PASSWORD }} 
+              cd $HOME/prometheus/
+              docker compose down  
 
   Delete-tmp-file:
     if: github.event.inputs.environment == 'delete-all-local-temp-files'
