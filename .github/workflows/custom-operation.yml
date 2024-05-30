@@ -1,0 +1,53 @@
+name: manual performing Individual task
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment
+        required: true
+        type: choice
+        options:
+          - 'upgrade-package'
+          - 'new-custom-task'
+          - 'custom-with-secret'
+          - 'delete-all-local-temp-files'
+
+jobs:
+  upgrade-package:
+    if: github.event.inputs.environment == 'upgrade-package'
+    runs-on: self-hosted
+    steps:
+      - name: Upgrade Package
+        working-directory: scripts
+        run: |
+            echo "Upgrading All scanning tools"
+            whoami
+            chmod +x upgrade-install.sh
+            sudo ./upgrade-install.sh
+  custom-task:
+    if: github.event.inputs.environment == 'new-custom-task'
+    runs-on: self-hosted
+    steps:
+      - name: Scanning sub-domains
+        working-directory: scripts 
+        run : |
+            ls -al
+
+  custom-task-secret:
+    if: github.event.inputs.environment == 'custom-with-secret'
+    runs-on: self-hosted
+    steps:
+        - name: Authenticating mega and copying file
+          working-directory: scripts
+          run: |
+              chmod +x mega-config.sh  
+              ./custom.sh -u ${{ secrets.USERNAME }} -p ${{ secrets.PASSWORD }} 
+
+  Delete-tmp-file:
+    if: github.event.inputs.environment == 'delete-all-local-temp-files'
+    runs-on: self-hosted
+    steps:
+        - name: Authenticating mega and copying file
+          run: |
+              ls -al

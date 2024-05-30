@@ -1,0 +1,26 @@
+# Simple workflow for reference
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  install_dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: list Directory
+        working-directory: scripts 
+        run: ls
+      
+      - name: Install dependencies
+        working-directory: scripts 
+        run: |
+            chmod +x dependency-install.sh
+            ./dependency-install.sh
