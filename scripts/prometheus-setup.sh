@@ -192,9 +192,9 @@ display_final() {
     echo -n  "Container name            :       "
     print_success "$user_container"
     echo -n  "Access GUI locally        :       "
-    print_success "http://$local_ip:$user_port"
+    print_success "http://$local_ip:$user_port/targets"
     echo -n  "Access GUI publicly       :       "
-    print_success "http://$public_ip:$user_port"
+    print_success "http://$public_ip:$user_port/targets"
     echo -n  "Stored file location      :       "
     print_success "$user_directory"
     print_separator
