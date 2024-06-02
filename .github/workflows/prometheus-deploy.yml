@@ -10,7 +10,7 @@ on:
 
 jobs:
   install_dependencies:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,7 +26,8 @@ jobs:
           ./dependency-install.sh
 
   deploy_prometheus:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    needs: [install_dependencies]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
