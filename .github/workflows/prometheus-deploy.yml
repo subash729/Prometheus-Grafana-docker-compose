@@ -35,4 +35,4 @@ jobs:
         working-directory: scripts 
         run: |
           chmod +x prometheus-setup.sh
-          ./prometheus-setup.sh
+          ./prometheus-setup.sh -c subash-test
