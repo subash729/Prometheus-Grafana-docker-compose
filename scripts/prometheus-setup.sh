@@ -190,11 +190,19 @@ display_final() {
     print_header "Results"
     echo -n  "Container name            :       "
     print_success "$user_container"
-    echo -n  "Access locally            :       "
-    print_success "http://$local_ip:$user_port/metrics"
-    echo -n  "Access publicly           :       "
-    print_success "http://$public_ip:$user_port/metrics"
+    echo -n  "Access GUI locally            :       "
+    print_success "http://$local_ip:$user_port"
+    echo -n  "Access GUI publicly           :       "
+    print_success "http://$public_ip:$user_port"
     echo -n  "Stored file location      :       "
+    print_success "$user_directory"
+    print_separator
+    print_separator
+        echo -n  "Access locally            :       "
+    print_success "http://$local_ip:$user_port/metrics"
+    echo -n  "Access Metrics publicly           :       "
+    print_success "http://$public_ip:$user_port/metrics"
+    echo -n  "Stored Metrics location      :       "
     print_success "$user_directory"
     print_separator
 }
