@@ -180,7 +180,7 @@ check_files_exist() {
 docker_compose() {
     cd $user_directory
     print_init "Creating container using docker compose up"
-    docker compose up -d &
+    docker compose up &
     print_separator
 }
 
