@@ -5,3 +5,8 @@ scrape_configs:
    static_configs:
     - targets:
        - prometheus:9090
+
+- job_name: Amazon-Cloud
+    static_configs:
+    - targets:
+       - 52.71.101.165:9100
