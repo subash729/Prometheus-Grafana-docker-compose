@@ -11,3 +11,7 @@ scrape_configs:
     static_configs:
       - targets:
           - 44.208.214.0:9100
+  - job_name: Amazon-Test
+    static_configs:
+      - targets:
+          - 44.208.214.5:9100
