@@ -43,7 +43,7 @@ function print_fail {
 # -------------Displaying Screen message in color end ----------------
 
 usage() {
-    print_header "Scan and Filter Subdomains"
+    print_header "prometheus setup"
 
     echo "Usage: $0 [-c <container_name>] [-d <data_directory>] [-p <port>]"
     echo "Options:"
@@ -120,6 +120,7 @@ prerequisite_setup() {
     print_init "Creating Directory $user_directory"
     print_separator
     mkdir -p $user_directory
+    mkdir -p $user_directory/backup-data
 
     print_intermediate "Copying prometheus.yml to $user_directory"
     cp "../source code/prometheus/prometheus.yml" $user_directory/prometheus.yml
@@ -131,13 +132,17 @@ generate_docker_compose() {
     print_header "Generating Docker Compose file"
 
     cat << EOF > "$compose_file"
-version: '3'
+version: '3.8'
 services:
   $user_container:
     container_name: $user_container
     image: prom/prometheus
     volumes:
       - prom_data:/etc/prometheus
+      - prom_data_backup:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
     networks:
       - localprom
     ports:
@@ -146,15 +151,22 @@ services:
 networks:
   localprom:
     driver: bridge
+
 volumes:
-  web_data:
   prom_data:
     driver: local
     driver_opts:
       type: none
       device: $user_directory
       o: bind
+  prom_data_backup:
+    driver: local
+    driver_opts:
+      type: none
+      device: $user_directory/backup-data
+      o: bind
 EOF
+
 
     print_success "Docker Compose file generated successfully at: $compose_file"
     print_separator
