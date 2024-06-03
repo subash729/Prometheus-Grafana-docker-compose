@@ -1,0 +1,12 @@
+groups:
+    - name: High-request
+      rules:
+        - alert: HighRequestRate
+          expr: sum(rate(http_requests_total{job="app"}[5m])) > 100
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: High request rate on {{ $labels.job }}
+            description: '{{ $labels.job }} has a high request rate ({{ $value }} req/s for the last 5 minutes).'
+  

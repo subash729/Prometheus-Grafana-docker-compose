@@ -123,7 +123,12 @@ prerequisite_setup() {
     mkdir -p $user_directory/backup-data
 
     print_intermediate "Copying prometheus.yml to $user_directory"
-    cp "../source code/prometheus/prometheus.yml" $user_directory/prometheus.yml
+    source_code_dir="../source code/prometheus"
+    if [ -f "$source_code_dir/prometheus.yml" ]; then
+        cp "$source_code_dir"/*.yml "$user_directory/"
+    else
+        cp "source code/prometheus"/*.yml "$user_directory/"
+    fi
 }
 
 generate_docker_compose() {
