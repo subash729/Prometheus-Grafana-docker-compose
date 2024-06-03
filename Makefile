@@ -5,8 +5,8 @@ SHELL := /bin/bash
 tools-install: ## Install dependencies for the scanner
 	@bash scripts/dependency-install.sh
 
-prometheus-up: ## Upload the scanned results.
-	@bash scripts/prometheus-setup.sh -c prometheus-server
+monitoring-up: ## Upload the scanned results.
+	@bash scripts/prom-grafana-setup.sh -c monitoring-server
 
 custom-task-arg: ## Upload the scanned results.
 	@bash scripts/new-custom-task.sh $(ARGS)

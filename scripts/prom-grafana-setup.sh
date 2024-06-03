@@ -135,12 +135,11 @@ generate_docker_compose() {
     local compose_file="$user_directory/docker-compose.yml"
 
     print_header "Generating Docker Compose file"
-
     cat << EOF > "$compose_file"
 version: '3.8'
 services:
-  $user_container:
-    container_name: $user_container
+  ${user_container}-prometheus:
+    container_name: ${user_container}-prometheus
     image: prom/prometheus
     volumes:
       - prom_data:/etc/prometheus
@@ -152,6 +151,19 @@ services:
       - localprom
     ports:
       - "$user_port:9090"
+
+  ${user_container}-grafana:
+    container_name: ${user_container}-grafana
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    networks:
+      - localprom
+    ports:
+      - "3000:3000"
 
 networks:
   localprom:
@@ -170,8 +182,13 @@ volumes:
       type: none
       device: $user_directory/backup-data
       o: bind
+  grafana_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: $user_directory/grafana
+      o: bind
 EOF
-
 
     print_success "Docker Compose file generated successfully at: $compose_file"
     print_separator
@@ -205,9 +222,9 @@ docker_compose() {
 display_final() {
     local_ip=$(hostname -I | awk '{print $1}')
     public_ip=$(curl -s ifconfig.me)
-    print_header "Results"
+    print_header "Prometheus"
     echo -n  "Container name            :       "
-    print_success "$user_container"
+    print_success "${user_container}-prometheus"
     echo -n  "Access GUI locally        :       "
     print_success "http://$local_ip:$user_port/targets"
     echo -n  "Access GUI publicly       :       "
@@ -221,6 +238,15 @@ display_final() {
     echo -n  "Access Metrics publicly           :       "
     print_success "http://$public_ip:$user_port/metrics"
     print_separator
+    print_header "Grafana"
+    echo -n  "Container name            :       "
+    print_success "${user_container}-grafana"
+    echo -n  "Access GUI locally        :       "
+    print_success "http://$local_ip:3000"
+    echo -n  "Access GUI publicly       :       "
+    print_success "http://$public_ip:3000"
+    echo -n  "Stored file location      :       "
+    print_success "$user_directory/grafana"
 }
 
 main() {
