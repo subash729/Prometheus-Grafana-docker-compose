@@ -35,5 +35,5 @@ jobs:
       - name: Deploying Prometheus
         working-directory: scripts 
         run: |
-          chmod +x prometheus-setup.sh
-          ./prometheus-setup.sh -c subash-test
+          chmod +x prom-grafana-setup.sh
+          ./prom-grafana-setup.sh -c ITENP
