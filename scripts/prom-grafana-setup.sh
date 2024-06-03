@@ -222,7 +222,7 @@ docker_compose() {
 display_final() {
     local_ip=$(hostname -I | awk '{print $1}')
     public_ip=$(curl -s ifconfig.me)
-    print_header "Prometheus"
+    print_header "PROMETHEUS"
     echo -n  "Container name            :       "
     print_success "${user_container}-prometheus"
     echo -n  "Access GUI locally        :       "
@@ -238,7 +238,7 @@ display_final() {
     echo -n  "Access Metrics publicly           :       "
     print_success "http://$public_ip:$user_port/metrics"
     print_separator
-    print_header "Grafana"
+    print_header "GRAFANA"
     echo -n  "Container name            :       "
     print_success "${user_container}-grafana"
     echo -n  "Access GUI locally        :       "
