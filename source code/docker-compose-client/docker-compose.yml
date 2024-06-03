@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  ubuntu:
+    image: ubuntu:latest
+    container_name: ubuntu-container
+    command: tail -f /dev/null # Keeps the container running
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)'
+    depends_on:
+      - ubuntu
+
+networks:
+  default:
+    driver: bridge
