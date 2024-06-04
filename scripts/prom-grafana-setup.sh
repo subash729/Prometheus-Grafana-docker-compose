@@ -216,8 +216,8 @@ EOF
 }
 
 check_files_exist() {
-    local compose_file=$user_directory/docker-compose.yml
-    local prometheus_file=$user_directory/prometheus.yml
+    local compose_file=$prom_config_dir/docker-compose.yml
+    local prometheus_file=$prom_config_dir/prometheus.yml
 
     # Check if docker-compose.yml file exists
     if [[ ! -f $compose_file ]]; then
