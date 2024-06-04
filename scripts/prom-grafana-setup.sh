@@ -102,7 +102,7 @@ taking_input() {
 
     # If data directory is not provided, use container name
     if [[ -z $data_directory ]]; then
-        data_directory="$HOME/prometheus"
+        data_directory="$HOME/monitoring"
     fi
     if [[ -z $port ]]; then
         port="9090"
@@ -116,20 +116,29 @@ taking_input() {
 
 prerequisite_setup() {
     print_header "1 - Setup"
-
-    print_init "Creating Directory $user_directory"
+    print_init "Creating Directory $user_directory and sub-directory for proetheus and grafana"
     print_separator
-    mkdir -p $user_directory
-    mkdir -p $user_directory/backup-data
-    mkdir -p $user_directory/grafana
+    prom_config_dir=$user_directory/prometheus-config
+    prom_data_dir=$user_directory/prometheus-backup-data
+    grafana_conf_dir=$user_directory/grafana-conf-backup-data
+    grafana_dashboard_dir=$user_directory/grafana-dashboard-template
+    mkdir -p $prom_config_dir
+    mkdir -p $prom_data_dir
+    mkdir -p $grafana_conf_dir
+    mkdir -p $grafana_dashboard_dir
 
-    print_intermediate "Copying prometheus.yml to $user_directory"
+
+    print_intermediate "Copying prometheus config under $user_directory"
     source_code_dir="../source code/prometheus"
     if [ -f "$source_code_dir/prometheus.yml" ]; then
-        cp "$source_code_dir"/*.yml "$user_directory/"
+        cp "$source_code_dir"/*.yml "$prom_config_dir"
     else
         cp "source code/prometheus"/*.yml "$user_directory/"
     fi
+    print_separator
+    print_intermediate "Copying grafana template and data under $user_directory"
+    cp "../extra files/grafana-template"/*.json $grafana_dashboard_dir
+
 }
 
 generate_docker_compose() {
@@ -158,6 +167,7 @@ services:
     image: grafana/grafana
     volumes:
       - grafana_data:/var/lib/grafana
+      - grafana_dashboard:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SECURITY_ADMIN_USER=admin
@@ -175,21 +185,28 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: $user_directory
+      device: $prom_config_dir
       o: bind
   prom_data_backup:
     driver: local
     driver_opts:
       type: none
-      device: $user_directory/backup-data
+      device: $prom_data_dir
       o: bind
   grafana_data:
     driver: local
     driver_opts:
       type: none
-      device: $user_directory/grafana
-      o: bind
+      device: $grafana_conf_dir
+      o: 
+  grafana_dashboard:
+    driver: local
+    driver_opts:
+      type: none
+      device: $grafana_dashboard_dir
+      o: 
 EOF
+
 
     print_success "Docker Compose file generated successfully at: $compose_file"
     print_separator
@@ -260,6 +277,7 @@ main() {
 
     print_success "All tasks are completed successfully!!!"
     print_separator
+    unset prom_config_dir prom_data_dir grafana_conf_dir grafana_dashboard_dir
 }
 
 main "$@"
