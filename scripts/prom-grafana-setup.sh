@@ -121,6 +121,7 @@ prerequisite_setup() {
     print_separator
     mkdir -p $user_directory
     mkdir -p $user_directory/backup-data
+    mkdir -p $user_directory/grafana
 
     print_intermediate "Copying prometheus.yml to $user_directory"
     source_code_dir="../source code/prometheus"
