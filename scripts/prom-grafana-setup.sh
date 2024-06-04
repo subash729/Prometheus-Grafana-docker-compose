@@ -164,7 +164,7 @@ services:
     networks:
       - localprom
     ports:
-      - "3001:3001"
+      - "3000:3000"
 
 networks:
   localprom:
@@ -243,9 +243,9 @@ display_final() {
     echo -n  "Container name            :       "
     print_success "${user_container}-grafana"
     echo -n  "Access GUI locally        :       "
-    print_success "http://$local_ip:3001"
+    print_success "http://$local_ip:3000"
     echo -n  "Access GUI publicly       :       "
-    print_success "http://$public_ip:3001"
+    print_success "http://$public_ip:3000"
     echo -n  "Stored file location      :       "
     print_success "$user_directory/grafana"
 }
