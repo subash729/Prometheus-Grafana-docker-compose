@@ -127,7 +127,7 @@ prerequisite_setup() {
     mkdir -p $prom_data_dir
     mkdir -p $grafana_conf_dir
     mkdir -p $grafana_dashboard_dir
-    print_intermediate "Created directory"
+    print_intermediate "Created directory and all stored files"
     tree -L 2 $user_directory 
 
 
@@ -216,12 +216,12 @@ EOF
 }
 
 check_files_exist() {
-    local compose_file=$prom_config_dir/docker-compose.yml
+    local compose_file=$user_directory/docker-compose.yml
     local prometheus_file=$prom_config_dir/prometheus.yml
 
     # Check if docker-compose.yml file exists
     if [[ ! -f $compose_file ]]; then
-        echo "Error: docker-compose.yml file not found in $prom_config_dir directory."
+        echo "Error: docker-compose.yml file not found in $user_directory directory."
         exit 1
     fi
 
