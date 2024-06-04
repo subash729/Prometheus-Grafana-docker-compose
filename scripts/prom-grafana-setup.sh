@@ -221,13 +221,13 @@ check_files_exist() {
 
     # Check if docker-compose.yml file exists
     if [[ ! -f $compose_file ]]; then
-        echo "Error: docker-compose.yml file not found in $user_directory directory."
+        echo "Error: docker-compose.yml file not found in $prom_config_dir directory."
         exit 1
     fi
 
     # Check if prometheus.yml file exists
     if [[ ! -f $prometheus_file ]]; then
-        echo "Error: prometheus.yml file not found in $user_directory directory."
+        echo "Error: prometheus.yml file not found in $prom_config_dir directory."
         exit 1
     fi
 }
