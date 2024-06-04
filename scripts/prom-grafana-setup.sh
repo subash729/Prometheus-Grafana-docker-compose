@@ -118,6 +118,7 @@ prerequisite_setup() {
     print_header "1 - Setup"
     print_init "Creating Directory $user_directory and sub-directory for proetheus and grafana"
     print_separator
+    sleep 1
     prom_config_dir=$user_directory/prometheus-config
     prom_data_dir=$user_directory/prometheus-backup-data
     grafana_conf_dir=$user_directory/grafana-conf-backup-data
@@ -126,6 +127,8 @@ prerequisite_setup() {
     mkdir -p $prom_data_dir
     mkdir -p $grafana_conf_dir
     mkdir -p $grafana_dashboard_dir
+    print_intermediate "Created directory"
+    tree -L 2 $user_directory 
 
 
     print_intermediate "Copying prometheus config under $user_directory"
@@ -198,13 +201,13 @@ volumes:
     driver_opts:
       type: none
       device: $grafana_conf_dir
-      o: 
+      o: bind
   grafana_dashboard:
     driver: local
     driver_opts:
       type: none
       device: $grafana_dashboard_dir
-      o: 
+      o: bind
 EOF
 
 
